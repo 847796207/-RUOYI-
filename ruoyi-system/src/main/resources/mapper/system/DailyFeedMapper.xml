@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.DailyFeedMapper">
+    
+    <resultMap type="DailyFeed" id="DailyFeedResult">
+        <result property="feedNumber"    column="feed_number"    />
+        <result property="name"    column="name"    />
+        <result property="feedTime"    column="feed_time"    />
+        <result property="food"    column="food"    />
+        <result property="id"    column="id"    />
+        <result property="newWeight"    column="new_weight"    />
+    </resultMap>
+
+    <sql id="selectDailyFeedVo">
+        select feed_number, name, feed_time, food, id, new_weight from daily_feed
+    </sql>
+
+    <select id="selectDailyFeedList" parameterType="DailyFeed" resultMap="DailyFeedResult">
+        <include refid="selectDailyFeedVo"/>
+        <where>  
+            <if test="feedNumber != null  and feedNumber != ''"> and feed_number = #{feedNumber}</if>
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="feedTime != null  and feedTime != ''"> and feed_time = #{feedTime}</if>
+            <if test="food != null  and food != ''"> and food = #{food}</if>
+            <if test="newWeight != null  and newWeight != ''"> and new_weight = #{newWeight}</if>
+        </where>
+    </select>
+    
+    <select id="selectDailyFeedById" parameterType="Long" resultMap="DailyFeedResult">
+        <include refid="selectDailyFeedVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDailyFeed" parameterType="DailyFeed" useGeneratedKeys="true" keyProperty="id">
+        insert into daily_feed
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="feedNumber != null">feed_number,</if>
+            <if test="name != null">name,</if>
+            <if test="feedTime != null">feed_time,</if>
+            <if test="food != null">food,</if>
+            <if test="newWeight != null">new_weight,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="feedNumber != null">#{feedNumber},</if>
+            <if test="name != null">#{name},</if>
+            <if test="feedTime != null">#{feedTime},</if>
+            <if test="food != null">#{food},</if>
+            <if test="newWeight != null">#{newWeight},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDailyFeed" parameterType="DailyFeed">
+        update daily_feed
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="feedNumber != null">feed_number = #{feedNumber},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="feedTime != null">feed_time = #{feedTime},</if>
+            <if test="food != null">food = #{food},</if>
+            <if test="newWeight != null">new_weight = #{newWeight},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDailyFeedById" parameterType="Long">
+        delete from daily_feed where id = #{id}
+    </delete>
+
+    <delete id="deleteDailyFeedByIds" parameterType="String">
+        delete from daily_feed where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

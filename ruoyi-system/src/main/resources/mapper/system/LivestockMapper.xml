@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.LivestockMapper">
+    
+    <resultMap type="Livestock" id="LivestockResult">
+        <result property="id"    column="id"    />
+        <result property="weight"    column="weight"    />
+        <result property="regin"    column="regin"    />
+        <result property="category"    column="category"    />
+        <result property="feed"    column="feed"    />
+        <result property="avater"    column="avater"    />
+        <result property="number"    column="number"    />
+        <result property="origin"    column="origin"    />
+        <result property="vaccine"    column="vaccine"    />
+    </resultMap>
+
+    <sql id="selectLivestockVo">
+        select id, weight, regin, category, feed, avater, number, origin,vaccine from livestock
+    </sql>
+
+    <select id="selectLivestockList" parameterType="Livestock" resultMap="LivestockResult">
+        <include refid="selectLivestockVo"/>
+        <where>  
+            <if test="weight != null  and weight != ''"> and weight = #{weight}</if>
+            <if test="regin != null  and regin != ''"> and regin = #{regin}</if>
+            <if test="category != null  and category != ''"> and category = #{category}</if>
+            <if test="feed != null  and feed != ''"> and feed = #{feed}</if>
+            <if test="avater != null  and avater != ''"> and avater = #{avater}</if>
+            <if test="number != null  and number != ''"> and number = #{number}</if>
+            <if test="origin != null  and origin != ''"> and origin = #{origin}</if>
+            <if test="vaccine != null  and vaccine != ''"> and vaccine = #{vaccine}</if>
+        </where>
+    </select>
+    
+    <select id="selectLivestockById" parameterType="Integer" resultMap="LivestockResult">
+        <include refid="selectLivestockVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertLivestock" parameterType="Livestock" useGeneratedKeys="true" keyProperty="id">
+        insert into livestock
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="weight != null">weight,</if>
+            <if test="regin != null">regin,</if>
+            <if test="category != null">category,</if>
+            <if test="feed != null">feed,</if>
+            <if test="avater != null">avater,</if>
+            <if test="number != null and number != ''">number,</if>
+            <if test="origin != null">origin,</if>
+            <if test="vaccine != null">vaccine,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="weight != null">#{weight},</if>
+            <if test="regin != null">#{regin},</if>
+            <if test="category != null">#{category},</if>
+            <if test="feed != null">#{feed},</if>
+            <if test="avater != null">#{avater},</if>
+            <if test="number != null and number != ''">#{number},</if>
+            <if test="origin != null">#{origin},</if>
+            <if test="vaccine != null">#{vaccine},</if>
+         </trim>
+    </insert>
+
+    <update id="updateLivestock" parameterType="Livestock">
+        update livestock
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="weight != null">weight = #{weight},</if>
+            <if test="regin != null">regin = #{regin},</if>
+            <if test="category != null">category = #{category},</if>
+            <if test="feed != null">feed = #{feed},</if>
+            <if test="avater != null">avater = #{avater},</if>
+            <if test="number != null and number != ''">number = #{number},</if>
+            <if test="origin != null">origin = #{origin},</if>
+            <if test="vaccine != null">vaccine = #{vaccine},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteLivestockById" parameterType="Integer">
+        delete from livestock where id = #{id}
+    </delete>
+
+    <delete id="deleteLivestockByIds" parameterType="String">
+        delete from livestock where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

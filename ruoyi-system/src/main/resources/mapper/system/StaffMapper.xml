@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.StaffMapper">
+    
+    <resultMap type="Staff" id="StaffResult">
+        <result property="id"    column="id"    />
+        <result property="name"    column="name"    />
+        <result property="staffNumber"    column="staff_number"    />
+        <result property="password"    column="password"    />
+        <result property="avater"    column="avater"    />
+    </resultMap>
+
+    <sql id="selectStaffVo">
+        select id, name, staff_number, password, avater from staff
+    </sql>
+
+    <select id="selectStaffList" parameterType="Staff" resultMap="StaffResult">
+        <include refid="selectStaffVo"/>
+        <where>  
+            <if test="name != null  and name != ''"> and name like concat('%', #{name}, '%')</if>
+            <if test="staffNumber != null  and staffNumber != ''"> and staff_number = #{staffNumber}</if>
+            <if test="password != null  and password != ''"> and password = #{password}</if>
+            <if test="avater != null  and avater != ''"> and avater = #{avater}</if>
+        </where>
+    </select>
+    
+    <select id="selectStaffById" parameterType="Long" resultMap="StaffResult">
+        <include refid="selectStaffVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertStaff" parameterType="Staff" useGeneratedKeys="true" keyProperty="id">
+        insert into staff
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="name != null">name,</if>
+            <if test="staffNumber != null">staff_number,</if>
+            <if test="password != null">password,</if>
+            <if test="avater != null">avater,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="name != null">#{name},</if>
+            <if test="staffNumber != null">#{staffNumber},</if>
+            <if test="password != null">#{password},</if>
+            <if test="avater != null">#{avater},</if>
+         </trim>
+    </insert>
+
+    <update id="updateStaff" parameterType="Staff">
+        update staff
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="name != null">name = #{name},</if>
+            <if test="staffNumber != null">staff_number = #{staffNumber},</if>
+            <if test="password != null">password = #{password},</if>
+            <if test="avater != null">avater = #{avater},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteStaffById" parameterType="Long">
+        delete from staff where id = #{id}
+    </delete>
+
+    <delete id="deleteStaffByIds" parameterType="String">
+        delete from staff where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

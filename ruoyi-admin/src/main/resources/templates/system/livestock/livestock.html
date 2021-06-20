@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh" xmlns:th="http://www.thymeleaf.org" xmlns:shiro="http://www.pollix.at/thymeleaf/shiro">
+<head>
+    <th:block th:include="include :: header('【请填写功能名称】列表')" />
+
+</head>
+
+<body class="gray-bg">
+     <div class="container-div">
+        <div class="row">
+            <div class="col-sm-12 search-collapse">
+                <form id="formId">
+                    <div class="select-list">
+                        <ul>
+                            <li>
+                                <label>体重：</label>
+                                <input type="text" name="weight"/>
+                            </li>
+                            <li>
+                                <label>所属区域：</label>
+                                <input type="text" name="regin"/>
+                            </li>
+                            <li>
+                                <label>种类：</label>
+                                <input type="text" name="category"/>
+                            </li>
+                            <li>
+                                <label>喂养情况：</label>
+                                <input type="text" name="feed"/>
+                            </li>
+                            <li>
+                                <label>图像地址：</label>
+                                <input type="text" name="avater"/>
+                            </li>
+                            <li>
+                                <label>电子耳标：</label>
+                                <input type="text" name="number"/>
+                            </li>
+                            <li>
+                                <label>原产地：</label>
+                                <input type="text" name="origin"/>
+                            </li>
+                            <li>
+                                <label>疫苗接种：</label>
+                                <input type="text" name="vaccine"/>
+                            </li>
+                            <li>
+                                <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i class="fa fa-search"></i>&nbsp;搜索</a>
+                                <a class="btn btn-warning btn-rounded btn-sm" onclick="$.form.reset()"><i class="fa fa-refresh"></i>&nbsp;重置</a>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+            <div class="btn-group-sm" id="toolbar" role="group">
+                <a class="btn btn-success" onclick="$.operate.add()" shiro:hasPermission="system:livestock:add">
+                    <i class="fa fa-plus"></i> 添加
+                </a>
+                <a class="btn btn-primary single disabled" onclick="$.operate.edit()" shiro:hasPermission="system:livestock:edit">
+                    <i class="fa fa-edit"></i> 修改
+                </a>
+                <a class="btn btn-primary"  onclick=xxx()  shiro:hasPermission="system:livestock:detail">
+                    <i class="fa fa-detail"></i> 信息
+                </a>
+                <a class="btn btn-danger multiple disabled" onclick="$.operate.removeAll()" shiro:hasPermission="system:livestock:remove">
+                    <i class="fa fa-remove"></i> 删除
+                </a>
+                <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="system:livestock:export">
+                    <i class="fa fa-download"></i> 导出
+                </a>
+            </div>
+            <div class="col-sm-12 select-table table-striped">
+                <table id="bootstrap-table"></table>
+            </div>
+        </div>
+    </div>
+    <th:block th:include="include :: footer" />
+     <script th:inline="javascript">
+         function xxx() {
+             $.modal.openTab("xinxi",livestock/detail);
+         }
+
+     </script>
+     <script type="text/javascript">
+         function selectColumnsByRow(column,uniqueId) {
+
+             if($.common.isEmpty(uniqueId)){
+                 var rows = $.map($("#" + table.options.id).bootstrapTable('getData'), function (row) {
+                     return $.common.getItemField(row, column);
+                 });
+                 return rows;
+             } else {
+                 return $.common.getItemField($("#" + table.options.id).bootstrapTable('getRowByUniqueId',uniqueId), column);
+             }
+         }
+     </script>
+    <script th:inline="javascript">
+        var editFlag = [[${@permission.hasPermi('system:livestock:edit')}]];
+        var removeFlag = [[${@permission.hasPermi('system:livestock:remove')}]];
+        var detailFlag = [[${@permission.hasPermi('system:livestock:detail')}]];
+        var prefix = ctx + "system/livestock";
+
+
+        $(function() {
+            var options = {
+                uniqueId: "userId",
+                url: prefix + "/list",
+                createUrl: prefix + "/add",
+                updateUrl: prefix + "/edit/{id}",
+                detailUrl: prefix + "/detail/{id}",
+                removeUrl: prefix + "/remove",
+                exportUrl: prefix + "/export",
+                cleanUrl: prefix + "/clean",
+                modalName: "【请填写功能名称】",
+                showPageGo: true,
+                columns: [{
+                    checkbox: true
+                },
+                {
+                    field: 'id',
+                    title: '编号',
+                    visible: false
+                },
+                {
+                    field: 'weight',
+                    title: '体重'
+                },
+                {
+                    field: 'regin',
+                    title: '所属区域'
+                },
+                {
+                    field: 'category',
+                    title: '种类'
+                },
+                {
+                    field: 'feed',
+                    title: '喂养情况'
+                },
+                {
+                    field:'avater',
+                    title: '图像地址',
+                    formatter: function(value, row, index) {
+
+                        if (value != null && value != ''){
+
+                            return $.table.imageView('/'+value);
+                        }else{
+                            return $.table.imageView('/img/default.jpg');
+                        }
+                    }
+                },
+                {
+                    field: 'number',
+                    title: '电子耳标',
+                },
+                {
+                    field: 'origin',
+                    title: '原产地'
+                },
+                    {
+                        field: 'vaccine',
+                        title: '疫苗接种'
+                    },
+                {
+                    title: '操作',
+                    align: 'center',
+                    formatter: function(value, row, index) {
+                        var actions = [];
+                        var detail_Url = prefix +"/detail";
+                        actions.push('<a class="btn btn-success btn-xs ' + editFlag + '" href="javascript:void(0)" onclick="$.operate.edit(\'' + row.id + '\')"><i class="fa fa-edit"></i>编辑</a> ');
+                        actions.push('<a class="btn btn-danger btn-xs ' + removeFlag + '" href="javascript:void(0)" onclick="$.operate.remove(\'' + row.id + '\')"><i class="fa fa-remove"></i>删除</a>');
+                        actions.push('<a class="btn btn-success btn-xs ' + detailFlag + '" href="javascript:void(0)" onclick="$.operate.detailTab(\'' + row.id + '\')" ><i class="fa fa-detail"></i>信息</a>');
+                        return actions.join('');
+                    }
+                }]
+            };
+            var zz = selectColumnsByRow("weight")
+            console.log(zz);
+            $.table.init(options);
+
+        });
+    </script>
+</body>
+</html>
